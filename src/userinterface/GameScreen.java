@@ -8,7 +8,6 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
-import gameobject.Clouds;
 import gameobject.EnemiesManager;
 import gameobject.Land;
 import gameobject.MainCharacter;
@@ -19,43 +18,54 @@ public class GameScreen extends JPanel implements Runnable, KeyListener {
 	private static final int START_GAME_STATE = 0;
 	private static final int GAME_PLAYING_STATE = 1;
 	private static final int GAME_OVER_STATE = 2;
-	
+	private static final int GAME_WIN_STATE = 3;
+
 	private Land land;
 	private MainCharacter mainCharacter;
 	private EnemiesManager enemiesManager;
-	private Clouds clouds;
-	private Thread thread;
 
 	private boolean isKeyPressed;
 
 	private int gameState = START_GAME_STATE;
+	private int fps = 60;	// Change to make board faster
 
 	private BufferedImage replayButtonImage;
 	private BufferedImage gameOverButtonImage;
 
 	public GameScreen() {
 		mainCharacter = new MainCharacter();
-		land = new Land(GameWindow.SCREEN_WIDTH, mainCharacter);
+		land = new Land();
 		mainCharacter.setSpeedX(4);
 		replayButtonImage = Resource.getResouceImage("src/data/replay_button.png");
 		gameOverButtonImage = Resource.getResouceImage("src/data/gameover_text.png");
 		enemiesManager = new EnemiesManager(mainCharacter);
-		clouds = new Clouds(GameWindow.SCREEN_WIDTH, mainCharacter);
 	}
 
 	public void startGame() {
-		thread = new Thread(this);
+		Thread thread = new Thread(this);
 		thread.start();
 	}
 
 	public void gameUpdate() {
 		if (gameState == GAME_PLAYING_STATE) {
-			clouds.update();
-			land.update();
 			mainCharacter.update();
 			enemiesManager.update();
-			if (enemiesManager.isCollision()) {
+			if (enemiesManager.getCollisionStatus() == EnemiesManager.DIAMOND_COLLISION) {
 				gameState = GAME_OVER_STATE;
+				mainCharacter.dead(true);
+			}
+			else if (enemiesManager.getCollisionStatus() == EnemiesManager.CIRCLE_COLLISION) {
+				fps = 120;
+				gameState = GAME_PLAYING_STATE;
+				mainCharacter.dead(false);
+			}
+			else if (enemiesManager.getCollisionStatus() == EnemiesManager.RECTANGLE_COLLISION) {
+				gameState = GAME_OVER_STATE;
+				mainCharacter.dead(true);
+			}
+			else if (mainCharacter.getScore() >= 40 && enemiesManager.getCollisionStatus() == -1) {
+				gameState = GAME_OVER_STATE;
+				mainCharacter.win(true);
 				mainCharacter.dead(true);
 			}
 		}
@@ -65,45 +75,60 @@ public class GameScreen extends JPanel implements Runnable, KeyListener {
 		g.setColor(Color.decode("#f7f7f7"));
 		g.fillRect(0, 0, getWidth(), getHeight());
 
-		switch (gameState) {
-		case START_GAME_STATE:
+		if (gameState == START_GAME_STATE) {
 			mainCharacter.draw(g);
-			break;
-		case GAME_PLAYING_STATE:
-		case GAME_OVER_STATE:
-			clouds.draw(g);
+		}
+		else if (gameState == GAME_PLAYING_STATE || gameState == GAME_OVER_STATE
+				|| gameState == GAME_WIN_STATE) {
+			//clouds.draw(g);
 			land.draw(g);
 			enemiesManager.draw(g);
 			mainCharacter.draw(g);
 			g.setColor(Color.BLACK);
-			g.drawString("HI " + mainCharacter.score, 500, 20);
-			if (gameState == GAME_OVER_STATE) {
-				g.drawImage(gameOverButtonImage, 200, 30, null);
+			g.drawString("Score " + mainCharacter.getScore(), 500, 20);
+			if (gameState == GAME_OVER_STATE || gameState == GAME_WIN_STATE) {
 				g.drawImage(replayButtonImage, 283, 50, null);
-				
+				if (mainCharacter.getScore() >= 40) {
+					g.drawString("WINNER!", 200, 30);
+				}
+				else {
+					g.drawImage(gameOverButtonImage, 200, 30, null);
+				}
+
 			}
-			break;
+//			else if (gameState == GAME_WIN_STATE) {
+//				g.drawString("WINNER!", 200, 30);
+//				g.drawImage(replayButtonImage, 283, 50, null);
+//			}
 		}
+//		else if (gameState == GAME_WIN_STATE) {
+//			land.draw(g);
+//			enemiesManager.draw(g);
+//			mainCharacter.draw(g);
+//			g.setColor(Color.BLACK);
+//			g.drawString("WINNER!", 200, 30);
+//			g.drawImage(replayButtonImage, 283, 50, null);
+//		}
 	}
 
 	@Override
 	public void run() {
 
-		int fps = 100;
-		long msPerFrame = 1000 * 1000000 / fps;
+		long msPerFrame;
 		long lastTime = 0;
 		long elapsed;
 		
 		int msSleep;
 		int nanoSleep;
 
-		long endProcessGame;
-		long lag = 0;
+//		long endProcessGame;
+//		long lag = 0;
 
 		while (true) {
 			gameUpdate();
+			msPerFrame = 1000 * 1000000 / fps;
 			repaint();
-			endProcessGame = System.nanoTime();
+//			endProcessGame = System.nanoTime();
 			elapsed = (lastTime + msPerFrame - System.nanoTime());
 			msSleep = (int) (elapsed / 1000000);
 			nanoSleep = (int) (elapsed % 1000000);
@@ -124,49 +149,57 @@ public class GameScreen extends JPanel implements Runnable, KeyListener {
 	public void keyPressed(KeyEvent e) {
 		if (!isKeyPressed) {
 			isKeyPressed = true;
-			switch (gameState) {
-			case START_GAME_STATE:
-				if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+			if (gameState == START_GAME_STATE) {
+				if (isSpaceOrUpArrowPressed(e.getKeyCode())) {
 					gameState = GAME_PLAYING_STATE;
 				}
-				break;
-			case GAME_PLAYING_STATE:
-				if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+			}
+			else if (gameState == GAME_PLAYING_STATE) {
+				if (isSpaceOrUpArrowPressed(e.getKeyCode())) {
 					mainCharacter.jump();
-				} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-					mainCharacter.down(true);
 				}
-				break;
-			case GAME_OVER_STATE:
-				if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+//				else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+//					mainCharacter.down(true);
+//				}
+			}
+			else if (gameState == GAME_OVER_STATE || gameState == GAME_WIN_STATE) {
+				if (isSpaceOrUpArrowPressed(e.getKeyCode())) {
 					gameState = GAME_PLAYING_STATE;
 					resetGame();
 				}
-				break;
-
 			}
+//			else if (gameState == GAME_WIN_STATE) {
+//				if (isSpaceOrUpArrowPressed(e.getKeyCode())) {
+//					gameState = GAME_PLAYING_STATE;
+//					resetGame();
+//				}
+//			}
 		}
+	}
+
+	private boolean isSpaceOrUpArrowPressed(int keyCode) {
+		return keyCode == KeyEvent.VK_SPACE || keyCode ==  KeyEvent.VK_UP;
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
 		isKeyPressed = false;
-		if (gameState == GAME_PLAYING_STATE) {
-			if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-				mainCharacter.down(false);
-			}
-		}
+//		if (gameState == GAME_PLAYING_STATE) {
+//			if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+//				mainCharacter.down(false);
+//			}
+//		}
 	}
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-
 	}
 
 	private void resetGame() {
+		fps = 60;
 		enemiesManager.reset();
 		mainCharacter.dead(false);
+		mainCharacter.win(false);
 		mainCharacter.reset();
 	}
 
