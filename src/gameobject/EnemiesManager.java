@@ -56,7 +56,6 @@ public class EnemiesManager {
 	}
 	
 	public Enemy createEnemy() {
-		// if (enemyType = getRandom)
 		Random rand = new Random();
 		int type = rand.nextInt(3);
 
@@ -64,23 +63,21 @@ public class EnemiesManager {
 //			System.out.println(strings);
 //		}
 //
-		int randomNum = rand.nextInt((shapeList.size() - 2) + 1) + 2;
+		int randomShape = rand.nextInt((shapeList.size() - 2) + 1) + 1;
 		switch (type) {
 			case 0:
-				return getCactus(2, diamond, DIAMOND);
+				return getCactus(randomShape, diamond, DIAMOND);
 			case 1:
-				return getCactus(3, circle, CIRCLE);
+				return getCactus(randomShape, circle, CIRCLE);
 			default:
-				return getCactus(4, rectangle, RECTANGLE);
+				return getCactus(randomShape, rectangle, RECTANGLE);
 		}
 	}
 
 	private Cactus getCactus(int i, BufferedImage image, ShapeType type) {
 		return new Cactus(
 				mainCharacter,
-//						800,
 				Integer.parseInt(shapeList.get(i).get(1)),
-//						280,
 				Integer.parseInt(shapeList.get(i).get(2)),
 				image.getWidth() - 10,
 				image.getHeight() - 10,

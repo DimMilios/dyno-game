@@ -52,21 +52,16 @@ public class GameScreen extends JPanel implements Runnable, KeyListener {
 			enemiesManager.update();
 			if (enemiesManager.getCollisionStatus() == EnemiesManager.DIAMOND_COLLISION) {
 				gameState = GAME_OVER_STATE;
-				mainCharacter.dead(true);
 			}
 			else if (enemiesManager.getCollisionStatus() == EnemiesManager.CIRCLE_COLLISION) {
 				fps = 120;
 				gameState = GAME_PLAYING_STATE;
-				mainCharacter.dead(false);
 			}
 			else if (enemiesManager.getCollisionStatus() == EnemiesManager.RECTANGLE_COLLISION) {
 				gameState = GAME_OVER_STATE;
-				mainCharacter.dead(true);
 			}
-			else if (mainCharacter.getScore() >= 40 && enemiesManager.getCollisionStatus() == -1) {
+			else if (mainCharacter.getScore() >= 40) {
 				gameState = GAME_OVER_STATE;
-				mainCharacter.win(true);
-				mainCharacter.dead(true);
 			}
 		}
 	}
@@ -80,7 +75,6 @@ public class GameScreen extends JPanel implements Runnable, KeyListener {
 		}
 		else if (gameState == GAME_PLAYING_STATE || gameState == GAME_OVER_STATE
 				|| gameState == GAME_WIN_STATE) {
-			//clouds.draw(g);
 			land.draw(g);
 			enemiesManager.draw(g);
 			mainCharacter.draw(g);
@@ -94,21 +88,8 @@ public class GameScreen extends JPanel implements Runnable, KeyListener {
 				else {
 					g.drawImage(gameOverButtonImage, 200, 30, null);
 				}
-
 			}
-//			else if (gameState == GAME_WIN_STATE) {
-//				g.drawString("WINNER!", 200, 30);
-//				g.drawImage(replayButtonImage, 283, 50, null);
-//			}
 		}
-//		else if (gameState == GAME_WIN_STATE) {
-//			land.draw(g);
-//			enemiesManager.draw(g);
-//			mainCharacter.draw(g);
-//			g.setColor(Color.BLACK);
-//			g.drawString("WINNER!", 200, 30);
-//			g.drawImage(replayButtonImage, 283, 50, null);
-//		}
 	}
 
 	@Override
@@ -121,14 +102,10 @@ public class GameScreen extends JPanel implements Runnable, KeyListener {
 		int msSleep;
 		int nanoSleep;
 
-//		long endProcessGame;
-//		long lag = 0;
-
 		while (true) {
 			gameUpdate();
 			msPerFrame = 1000 * 1000000 / fps;
 			repaint();
-//			endProcessGame = System.nanoTime();
 			elapsed = (lastTime + msPerFrame - System.nanoTime());
 			msSleep = (int) (elapsed / 1000000);
 			nanoSleep = (int) (elapsed % 1000000);
@@ -158,9 +135,6 @@ public class GameScreen extends JPanel implements Runnable, KeyListener {
 				if (isSpaceOrUpArrowPressed(e.getKeyCode())) {
 					mainCharacter.jump();
 				}
-//				else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-//					mainCharacter.down(true);
-//				}
 			}
 			else if (gameState == GAME_OVER_STATE || gameState == GAME_WIN_STATE) {
 				if (isSpaceOrUpArrowPressed(e.getKeyCode())) {
@@ -168,12 +142,6 @@ public class GameScreen extends JPanel implements Runnable, KeyListener {
 					resetGame();
 				}
 			}
-//			else if (gameState == GAME_WIN_STATE) {
-//				if (isSpaceOrUpArrowPressed(e.getKeyCode())) {
-//					gameState = GAME_PLAYING_STATE;
-//					resetGame();
-//				}
-//			}
 		}
 	}
 
@@ -184,11 +152,6 @@ public class GameScreen extends JPanel implements Runnable, KeyListener {
 	@Override
 	public void keyReleased(KeyEvent e) {
 		isKeyPressed = false;
-//		if (gameState == GAME_PLAYING_STATE) {
-//			if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-//				mainCharacter.down(false);
-//			}
-//		}
 	}
 
 	@Override
@@ -198,8 +161,6 @@ public class GameScreen extends JPanel implements Runnable, KeyListener {
 	private void resetGame() {
 		fps = 60;
 		enemiesManager.reset();
-		mainCharacter.dead(false);
-		mainCharacter.win(false);
 		mainCharacter.reset();
 	}
 

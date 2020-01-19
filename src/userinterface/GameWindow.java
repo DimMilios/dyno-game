@@ -40,19 +40,5 @@ public class GameWindow extends JFrame {
 
 	public static void main(String[] args) {
 		(new GameWindow()).startGame();
-
-		try {
-			List<List<String>> shapeList = CSVParser.getShapeList();
-
-//			for (List<String> strings : shapeList) {
-////				System.out.println(strings);
-//				for (String str : strings) {
-//					System.out.println(str);
-//				}
-//			}
-			System.out.println(shapeList.get(2).get(1));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 }
