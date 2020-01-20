@@ -1,7 +1,6 @@
 package userinterface;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
@@ -20,6 +19,8 @@ public class GameScreen extends JPanel implements Runnable, KeyListener {
 	private static final int GAME_OVER_STATE = 2;
 	private static final int GAME_WIN_STATE = 3;
 
+	private static final int WINNING_SCORE = 400;
+
 	private Land land;
 	private MainCharacter mainCharacter;
 	private EnemiesManager enemiesManager;
@@ -29,11 +30,14 @@ public class GameScreen extends JPanel implements Runnable, KeyListener {
 	private int gameState = START_GAME_STATE;
 	private int fps = 60;	// Change to make board faster
 
+	private float speedY;
+
 	private BufferedImage replayButtonImage;
 	private BufferedImage gameOverButtonImage;
 
 	public GameScreen() {
 		mainCharacter = new MainCharacter();
+		this.speedY = mainCharacter.getSpeedY();
 		land = new Land();
 		mainCharacter.setSpeedX(4);
 		replayButtonImage = Resource.getResouceImage("src/data/replay_button.png");
@@ -51,16 +55,15 @@ public class GameScreen extends JPanel implements Runnable, KeyListener {
 			mainCharacter.update();
 			enemiesManager.update();
 			if (enemiesManager.getCollisionStatus() == EnemiesManager.DIAMOND_COLLISION) {
-				gameState = GAME_OVER_STATE;
+				this.speedY = -13.5f;
 			}
 			else if (enemiesManager.getCollisionStatus() == EnemiesManager.CIRCLE_COLLISION) {
 				fps = 120;
-				gameState = GAME_PLAYING_STATE;
 			}
 			else if (enemiesManager.getCollisionStatus() == EnemiesManager.RECTANGLE_COLLISION) {
 				gameState = GAME_OVER_STATE;
 			}
-			else if (mainCharacter.getScore() >= 40) {
+			else if (mainCharacter.getScore() >= WINNING_SCORE) {
 				gameState = GAME_OVER_STATE;
 			}
 		}
@@ -70,23 +73,27 @@ public class GameScreen extends JPanel implements Runnable, KeyListener {
 		g.setColor(Color.decode("#f7f7f7"));
 		g.fillRect(0, 0, getWidth(), getHeight());
 
+		Font font = new Font("Sans", Font.BOLD, 24);
+		g.setFont(font);
+
 		if (gameState == START_GAME_STATE) {
 			mainCharacter.draw(g);
 		}
-		else if (gameState == GAME_PLAYING_STATE || gameState == GAME_OVER_STATE
+		else if (gameState == GAME_PLAYING_STATE
+				|| gameState == GAME_OVER_STATE
 				|| gameState == GAME_WIN_STATE) {
 			land.draw(g);
 			enemiesManager.draw(g);
 			mainCharacter.draw(g);
 			g.setColor(Color.BLACK);
-			g.drawString("Score " + mainCharacter.getScore(), 500, 20);
+			g.drawString("Score: " + mainCharacter.getScore(), GameWindow.SCREEN_WIDTH - 150, 40);
 			if (gameState == GAME_OVER_STATE || gameState == GAME_WIN_STATE) {
 				g.drawImage(replayButtonImage, 283, 50, null);
-				if (mainCharacter.getScore() >= 40) {
-					g.drawString("WINNER!", 200, 30);
+				if (mainCharacter.getScore() >= WINNING_SCORE) {
+					g.drawString("WINNER!", GameWindow.SCREEN_WIDTH / 2, 30);
 				}
 				else {
-					g.drawImage(gameOverButtonImage, 200, 30, null);
+					g.drawImage(gameOverButtonImage, GameWindow.SCREEN_WIDTH / 2, 30, null);
 				}
 			}
 		}
@@ -133,7 +140,7 @@ public class GameScreen extends JPanel implements Runnable, KeyListener {
 			}
 			else if (gameState == GAME_PLAYING_STATE) {
 				if (isSpaceOrUpArrowPressed(e.getKeyCode())) {
-					mainCharacter.jump();
+					mainCharacter.jump(speedY);
 				}
 			}
 			else if (gameState == GAME_OVER_STATE || gameState == GAME_WIN_STATE) {

@@ -5,7 +5,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
-public class Cactus extends Enemy {
+public class EnemyShape extends Enemy {
 	
 	public static final int Y_LAND = 280;
 	
@@ -21,13 +21,13 @@ public class Cactus extends Enemy {
 	
 	private Rectangle rectBound;
 	
-	public Cactus(MainCharacter mainCharacter,
-				  int posX,
-				  int posY,
-				  int width,
-				  int height,
-				  BufferedImage image,
-				  ShapeType type) {
+	public EnemyShape(MainCharacter mainCharacter,
+					  int posX,
+					  int posY,
+					  int width,
+					  int height,
+					  BufferedImage image,
+					  ShapeType type) {
 		this.posX = posX;
 		this.posY = posY;
 		this.width = width;
@@ -46,9 +46,9 @@ public class Cactus extends Enemy {
 //		g.drawImage(image, posX, Y_LAND - image.getHeight(), null);
 		g.drawImage(image, posX, posY - image.getHeight(), null);
 
-		g.setColor(Color.red);
-		Rectangle bound = getBound();
-		g.drawRect(bound.x, bound.y, bound.width, bound.height);
+//		g.setColor(Color.red);
+//		Rectangle bound = getBound();
+//		g.drawRect(bound.x, bound.y, bound.width, bound.height);
 	}
 
 	public Rectangle getBound() {

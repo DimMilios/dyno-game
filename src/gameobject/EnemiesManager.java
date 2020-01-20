@@ -2,7 +2,6 @@ package gameobject;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -57,44 +56,72 @@ public class EnemiesManager {
 	
 	public Enemy createEnemy() {
 		Random rand = new Random();
-		int type = rand.nextInt(3);
-
-//		for(List<String> strings : shapeList) {
-//			System.out.println(strings);
-//		}
-//
 		int randomShape = rand.nextInt((shapeList.size() - 2) + 1) + 1;
-		switch (type) {
-			case 0:
-				return getCactus(randomShape, diamond, DIAMOND);
-			case 1:
-				return getCactus(randomShape, circle, CIRCLE);
-			default:
-				return getCactus(randomShape, rectangle, RECTANGLE);
-		}
+		return getEnemyShape(shapeList.get(randomShape));
 	}
 
-	private Cactus getCactus(int i, BufferedImage image, ShapeType type) {
-		return new Cactus(
-				mainCharacter,
-				Integer.parseInt(shapeList.get(i).get(1)),
-				Integer.parseInt(shapeList.get(i).get(2)),
-				image.getWidth() - 10,
-				image.getHeight() - 10,
-				image,
-				type);
+	private EnemyShape getEnemyShape(List<String> row) {
+
+		String shapeType = row.get(0);
+
+		int posX = Integer.parseInt(row.get(1));
+		int posY = Integer.parseInt(row.get(2));
+
+		switch(shapeType) {
+			case "DIAMOND":
+				return new EnemyShape(
+						mainCharacter,
+						posX,
+						posY,
+						diamond.getWidth() - 10,
+						diamond .getHeight() - 10,
+						diamond,
+						DIAMOND);
+			case "CIRCLE":
+				return new EnemyShape(
+						mainCharacter,
+						posX,
+						posY,
+						circle.getWidth() - 10,
+						circle.getHeight() - 10,
+						circle,
+						CIRCLE);
+			case "RECTANGLE":
+				return new EnemyShape(
+						mainCharacter,
+						posX,
+						posY,
+						rectangle.getWidth() - 10,
+						rectangle.getHeight() - 10,
+						rectangle,
+						RECTANGLE);
+			default:
+				throw new RuntimeException("Error while parsing shape type from file");
+		}
+
 	}
+
+//	private EnemyShape getEnemyShape(int i, BufferedImage image, ShapeType type) {
+//		return new EnemyShape(
+//				mainCharacter,
+//				Integer.parseInt(shapeList.get(i).get(1)),
+//				Integer.parseInt(shapeList.get(i).get(2)),
+//				image.getWidth() - 10,
+//				image.getHeight() - 10,
+//				image,
+//				type);
+//	}
 
 	public int getCollisionStatus() {
-		for(Enemy e : enemies) {
-			if (mainCharacter.getBound().intersects(e.getBound()) ) {
-				if (e.getType().equals(DIAMOND)) {
+		for(Enemy enemy : enemies) {
+			if (mainCharacter.getBound().intersects(enemy.getBound()) ) {
+				if (enemy.getType().equals(DIAMOND)) {
 					return DIAMOND_COLLISION;
 				}
-				else if (e.getType().equals(CIRCLE)) {
+				else if (enemy.getType().equals(CIRCLE)) {
 					return CIRCLE_COLLISION;
 				}
-				else if (e.getType().equals(RECTANGLE)) {
+				else if (enemy.getType().equals(RECTANGLE)) {
 					return RECTANGLE_COLLISION;
 				}
 			}

@@ -8,17 +8,15 @@ import util.Resource;
 
 public class MainCharacter {
 
-	public static final int LAND_POSY = 240;
+	public static final int LAND_POSY = 530;
 	public static final float GRAVITY = 0.5f;
-	
-	private static final int NORMAL_RUN = 0;
-	private static final int WON = 1;
-	private static final int DEATH = 2;
+
+	private static final int SCORE_INCREMENT = 20;
 	
 	private float posY;
 	private float posX;
 	private float speedX;
-	private float speedY = -10.5f;	// Jump distance
+	private float speedY = -16.5f;	// Jump distance
 	private Rectangle rectBound;
 	
 	private int score = 0;
@@ -48,11 +46,15 @@ public class MainCharacter {
 		}
 	}
 	
-	public void jump() {
+	public void jump(float newSpeedY) {
 		if(posY >= LAND_POSY) {
-			speedY = -10.5f;
+			speedY = newSpeedY;
 			posY += speedY;
 		}
+	}
+
+	public float getSpeedY() {
+		return speedY;
 	}
 
 	public float getSpeedX() {
@@ -61,6 +63,10 @@ public class MainCharacter {
 
 	public void setSpeedX(int speedX) {
 		this.speedX = speedX;
+	}
+
+	public void setSpeedY(float speedY) {
+		this.speedY = speedY;
 	}
 
 	public int getScore() {
@@ -82,7 +88,10 @@ public class MainCharacter {
 	}
 
 	public void upScore() {
-		score += 20;
+		score += SCORE_INCREMENT;
 	}
-	
+
+	public void upScore(int times) {
+		score += SCORE_INCREMENT * times;
+	}
 }

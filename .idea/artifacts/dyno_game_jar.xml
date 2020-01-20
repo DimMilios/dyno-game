@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="dyno-game:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/dyno_game_jar</output-path>
+    <root id="archive" name="dyno-game.jar">
+      <element id="module-output" name="dyno-game" />
+    </root>
+  </artifact>
+</component>

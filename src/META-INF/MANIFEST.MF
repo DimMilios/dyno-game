@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Main-Class: userinterface.GameWindow
+Class-Path: C:\Users\dimit\Documents\IntellijProjects\dyno-game\out\prod
+ uction\dyno-game\userinterface\GameWindow
+

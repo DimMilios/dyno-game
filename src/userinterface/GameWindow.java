@@ -7,8 +7,8 @@ import java.util.List;
 
 public class GameWindow extends JFrame {
 	
-	public static final int SCREEN_WIDTH = 600;
-	public static final int SCREEN_HEIGHT = 400;
+	public static final int SCREEN_WIDTH = 1280;
+	public static final int SCREEN_HEIGHT = 800;
 	private GameScreen gameScreen;
 
 	public GameWindow() {
@@ -19,7 +19,7 @@ public class GameWindow extends JFrame {
 		setResizable(false);
 		
 		gameScreen = new GameScreen();
-		addKeyListener(gameScreen);
+		addKeyListener(gameScreen);  
 		add(gameScreen);
 	}
 	
